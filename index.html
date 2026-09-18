@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connecting Journeys Dashboard</title>
+<meta name="description" content="Interactive market research dashboard — Connecting Train Journeys in India survey (n=94).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
+<style>
+  /* Restrained system: one accent (teal) marks what matters; a neutral slate
+     ramp carries everything else; a muted red is reserved for genuine risk KPIs. */
+  :root{
+    --ground:#F1F3FA; --surface:#FFFFFF; --surface-2:#F7F8FC;
+    --ink:#151A2B; --ink-soft:#4C5570; --muted:#828CA3; --hair:#E2E5F0;
+    --accent:#12968A; --accent-soft:#E4F5F3;
+    --risk:#C4432E; --risk-soft:#FBEAE6;
+    --slate:#7C879E; --slate-2:#9AA3B8; --slate-3:#C2C8D8; --slate-4:#DCE0EB;
+    --track:#E7EAF3; --sidebar:#11162A; --sidebar-ink:#EDEFF6; --sidebar-muted:#7E88A3; --sidebar-hair:#232A42;
+    --shadow: 0 1px 2px rgba(21,26,43,.05), 0 10px 26px -14px rgba(21,26,43,.16);
+    --sidebar-w: 236px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ground:#0A0E1C; --surface:#141A2E; --surface-2:#1A2136;
+      --ink:#EDEFF6; --ink-soft:#AAB2C8; --muted:#707A94; --hair:#242C44;
+      --accent:#2FD1C4; --accent-soft:rgba(47,209,196,.13);
+      --risk:#E2735A; --risk-soft:rgba(226,115,90,.14);
+      --slate:#4C5876; --slate-2:#3A4460; --slate-3:#2C3450; --slate-4:#232B44;
+      --track:#212842; --sidebar:#070A16; --sidebar-ink:#EDEFF6; --sidebar-muted:#6C7690; --sidebar-hair:#1A2036;
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 14px 32px -16px rgba(0,0,0,.6);
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{ margin:0; background:var(--ground); color:var(--ink); font-family:"Poppins", ui-sans-serif, system-ui, sans-serif; }
+  .num{ font-variant-numeric: tabular-nums; font-weight:600; }
+  a{ color:inherit; }
+
+  /* ---------------- layout shell ---------------- */
+  .shell{ display:flex; min-height:100vh; }
+
+  .sidebar{
+    width:var(--sidebar-w); flex:none; background:var(--sidebar); color:var(--sidebar-ink);
+    display:flex; flex-direction:column; position:sticky; top:0; height:100vh; overflow-y:auto;
+  }
+  .sb-brand{ padding:22px 20px 16px; border-bottom:1px solid var(--sidebar-hair); }
+  .sb-eyebrow{ font-family:"Poppins",sans-serif; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); display:flex; align-items:center; gap:8px; }
+  .sb-eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:var(--risk); flex:none; }
+  .sb-title{ font-family:"Poppins", sans-serif; font-weight:800; font-size:23px; line-height:1.05; margin-top:8px; text-wrap:balance; }
+  .sb-nav{ padding:14px 12px; display:flex; flex-direction:column; gap:3px; }
+  .sb-link{
+    display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:8px;
+    background:none; border:none; color:var(--sidebar-muted); font-family:"Poppins",sans-serif;
+    font-size:13.5px; font-weight:500; text-align:left; cursor:pointer; width:100%;
+  }
+  .sb-link .ix{ font-family:"Poppins",sans-serif; font-size:10.5px; width:18px; flex:none; opacity:.7; }
+  .sb-link:hover{ background:rgba(255,255,255,.05); color:var(--sidebar-ink); }
+  .sb-link.active{ background:var(--accent-soft); color:var(--accent); font-weight:600; }
+  .sb-link.active .ix{ opacity:1; }
+  .sb-meta{ margin-top:auto; padding:16px 20px 22px; border-top:1px solid var(--sidebar-hair); font-family:"Poppins",sans-serif; font-size:10.5px; color:var(--sidebar-muted); display:flex; flex-direction:column; gap:5px; }
+  .sb-meta b{ color:var(--sidebar-ink); }
+  .sb-toggle{ display:none; }
+
+  main{ flex:1; min-width:0; padding:26px clamp(16px,3.5vw,40px) 60px; }
+  .view{ display:none; max-width:1320px; margin-inline:auto; flex-direction:column; gap:20px; }
+  .view.active{ display:flex; }
+
+  .page-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; border-bottom:2px solid var(--ink); padding-bottom:14px; }
+  .page-head h1{ font-family:"Poppins",sans-serif; font-weight:800; font-size:clamp(24px,3vw,34px); line-height:1; margin:0; text-wrap:balance; }
+  .page-sub{ font-size:12.5px; color:var(--muted); max-width:52ch; line-height:1.5; margin-top:6px; }
+  .page-n{ font-family:"Poppins",sans-serif; font-size:11.5px; color:var(--muted); text-align:right; }
+
+  .section-label{ font-family:"Poppins",sans-serif; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin:6px 0 -6px; }
+
+  /* ---------------- KPI tiles ---------------- */
+  .kpi-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .kpi{
+    background:var(--surface); border:1px solid var(--hair); border-radius:11px; box-shadow:var(--shadow);
+    padding:16px 16px 14px; display:flex; flex-direction:column; gap:7px; position:relative; overflow:hidden; cursor:default;
+  }
+  .kpi::before{ content:""; position:absolute; inset:0 0 auto 0; height:3px; background:var(--bar,var(--accent)); }
+  .kpi .kv{ font-family:"Poppins",sans-serif; font-weight:700; font-size:clamp(24px,2.4vw,30px); line-height:1; color:var(--tone,var(--ink)); }
+  .kpi .kl{ font-size:12.5px; font-weight:600; color:var(--ink); line-height:1.3; }
+  .kpi .kd{ font-size:11px; color:var(--ink-soft); line-height:1.45; }
+  .kpi .kf{ font-size:10px; color:var(--muted); font-family:"Poppins",sans-serif; margin-top:2px; }
+  .kpi.t-good{ --tone:var(--accent); --bar:var(--accent); }
+  .kpi.t-risk{ --tone:var(--risk); --bar:var(--risk); }
+  .kpi.t-warn, .kpi.t-base, .kpi.t-plum, .kpi.t-sage{ --tone:var(--ink); --bar:var(--slate-3); }
+
+  /* ---------------- panels / charts ---------------- */
+  .panel-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:14px; align-items:start; }
+  .panel{
+    background:var(--surface); border:1px solid var(--hair); border-radius:12px; box-shadow:var(--shadow);
+    padding:16px 18px 14px; display:flex; flex-direction:column; gap:10px; min-width:0;
+  }
+  .panel.wide{ grid-column: span 2; }
+  @media (max-width: 760px){ .panel.wide{ grid-column: span 1; } }
+  .panel-head{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .panel-title{ font-weight:600; font-size:13.5px; }
+  .panel-n{ font-family:"Poppins",sans-serif; font-size:10px; color:var(--muted); }
+  .chart-wrap{ position:relative; height:220px; }
+  .chart-wrap.tall{ height:270px; }
+  .chart-wrap.short{ height:150px; }
+  .detail-line{
+    font-size:11.5px; color:var(--ink-soft); min-height:16px; padding-top:6px; border-top:1px dashed var(--hair);
+    font-family:"Poppins",sans-serif; line-height:1.4;
+  }
+  .detail-line b{ color:var(--accent); font-weight:600; }
+  .detail-line .hint{ color:var(--muted); font-style:italic; font-family:"Poppins",sans-serif; }
+
+  /* ---------------- marketing / KPI explainer cards ---------------- */
+  .mm-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:14px; }
+  .mm-card{
+    background:var(--surface); border:1px solid var(--hair); border-radius:12px; box-shadow:var(--shadow);
+    padding:18px 20px; display:flex; flex-direction:column; gap:9px;
+  }
+  .mm-card .mv{ font-family:"Poppins",sans-serif; font-weight:700; font-size:32px; color:var(--accent); line-height:1; }
+  .mm-card .ml{ font-weight:600; font-size:14px; }
+  .mm-formula{
+    font-family:"Poppins",sans-serif; font-size:10.5px; color:var(--accent); background:var(--surface-2);
+    border:1px solid var(--hair); border-radius:6px; padding:7px 9px; line-height:1.5;
+  }
+  .mm-desc{ font-size:11.5px; color:var(--ink-soft); line-height:1.55; }
+
+  .synth{
+    background:#141C2C; color:#E7E2D4; border-radius:12px; padding:16px 22px;
+    display:flex; gap:14px; align-items:center; flex-wrap:wrap; font-size:12.5px; line-height:1.55;
+  }
+  .synth-tag{
+    font-family:"Poppins",sans-serif; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--accent); border:1px solid var(--accent); padding:4px 9px; border-radius:999px; flex:none;
+  }
+  .synth p{ margin:0; flex:1; min-width:240px; color:rgba(231,226,212,.92); }
+  .synth b{ color:#4FE0D3; font-weight:600; }
+
+  footer.page-foot{ font-size:10.5px; color:var(--muted); text-align:center; padding-top:6px; font-family:"Poppins",sans-serif; }
+
+  /* ---------------- responsive ---------------- */
+  @media (max-width: 980px){
+    .kpi-grid{ grid-template-columns:repeat(2,1fr); }
+  }
+  @media (max-width: 860px){
+    .shell{ flex-direction:column; }
+    .sidebar{ position:relative; width:100%; height:auto; flex-direction:row; align-items:center; padding:0; overflow:visible; }
+    .sb-brand{ border-bottom:none; padding:14px 14px 14px 18px; flex:1; }
+    .sb-title{ font-size:19px; }
+    .sb-nav{ display:none; flex-direction:column; position:absolute; top:100%; left:0; right:0; background:var(--sidebar); padding:8px 10px 14px; border-bottom:1px solid var(--sidebar-hair); z-index:20; }
+    .sb-nav.open{ display:flex; }
+    .sb-meta{ display:none; }
+    .sb-toggle{
+      display:flex; align-items:center; gap:6px; background:none; border:1px solid var(--sidebar-hair); color:var(--sidebar-ink);
+      font-family:"Poppins",sans-serif; font-size:11px; padding:8px 12px; border-radius:8px; margin-right:14px; cursor:pointer;
+    }
+    main{ padding:20px 16px 48px; }
+  }
+  @media (max-width: 520px){
+    .kpi-grid{ grid-template-columns:repeat(2,1fr); }
+    .panel-grid{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="sb-brand" style="display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div class="sb-eyebrow"><span class="dot"></span>TEAM 5 · IRCTC</div>
+        <div class="sb-title">Connecting<br>Journeys</div>
+      </div>
+      <button class="sb-toggle" id="navToggle">☰ Menu</button>
+    </div>
+    <nav class="sb-nav" id="sbNav">
+      <button class="sb-link active" data-view="explorer"><span class="ix">01</span> Data Explorer</button>
+      <button class="sb-link" data-view="kpi"><span class="ix">02</span> KPI Dashboard</button>
+      <button class="sb-link" data-view="marketing"><span class="ix">03</span> Marketing Metrics</button>
+    </nav>
+    <div class="sb-meta">
+      <div>SAMPLE <b class="num">n = 94</b></div>
+      <div>SCREENED BASE <b class="num">n = 68</b></div>
+      <div>INSTRUMENT <b>13-Q survey</b></div>
+      <div>SOURCE <b>Uploaded CSV</b></div>
+    </div>
+  </aside>
+
+  <main>
+
+    <!-- ============ VIEW 1: DATA EXPLORER ============ -->
+    <section class="view active" id="view-explorer">
+      <div class="page-head">
+        <div>
+          <h1>Data Explorer</h1>
+          <div class="page-sub">Every question from the survey, charted from the raw response file. Click any bar or slice for its exact count.</div>
+        </div>
+        <div class="page-n num">All charts live · click to inspect</div>
+      </div>
+
+      <div class="section-label">Who we surveyed &middot; n = 94</div>
+      <div class="panel-grid">
+        <div class="panel"><div class="panel-head"><div class="panel-title">Q1 &middot; Age Group</div><div class="panel-n num">n=94</div></div><div class="chart-wrap"><canvas id="c_q1"></canvas></div><div class="detail-line" id="d_q1"><span class="hint">Click a bar for its exact count</span></div></div>
+        <div class="panel"><div class="panel-head"><div class="panel-title">Q2 &middot; Travel Frequency</div><div class="panel-n num">n=94</div></div><div class="chart-wrap"><canvas id="c_q2"></canvas></div><div class="detail-line" id="d_q2"><span class="hint">Click a bar for its exact count</span></div></div>
+        <div class="panel"><div class="panel-head"><div class="panel-title">Q3 &middot; Took a 2+ Train Journey</div><div class="panel-n num">n=94</div></div><div class="chart-wrap short"><canvas id="c_q3"></canvas></div><div class="detail-line" id="d_q3"><span class="hint">Click a slice for its exact count</span></div></div>
+      </div>
+
+      <div class="section-label">Booking &amp; planning &middot; screened n = 68</div>
+      <div class="panel-grid">
+        <div class="panel"><div class="panel-head"><div class="panel-title">Q4 &middot; Booking Method</div><div class="panel-n num">n=68</div></div><div class="chart-wrap"><canvas id="c_q4"></canvas></div><div class="detail-line" id="d_q4"><span class="hint">Click a slice for its exact count</span></div></div>
+        <div class="panel"><div class="panel-head"><div class="panel-title">Q5 &middot; Planning Method</div><div class="panel-n num">n=68</div></div><div class="chart-wrap tall"><canvas id="c_q5"></canvas></div><div class="detail-line" id="d_q5"><span class="hint">Click a bar for its exact count</span></div></div>
+      </div>
+
+      <div class="section-label">The connection experience &middot; screened n = 68</div>
+      <div class="panel-grid">
+        <div class="panel"><div class="panel-head"><div class="panel-title">Q6 &middot; Connection Difficulty</div><div class="panel-n num">n=68</div></div><div class="chart-wrap"><canvas id="c_q6"></canvas></div><div class="detail-line" id="d_q6"><span class="hint">Click a bar for its exact count</span></div></div>
+        <div class="panel"><div class="panel-head"><div class="panel-title">Q7 &middot; Scheduled Buffer Time</div><div class="panel-n num">n=68</div></div><div class="chart-wrap"><canvas id="c_q7"></canvas></div><div class="detail-line" id="d_q7"><span class="hint">Click a bar for its exact count</span></div></div>
+        <div class="panel"><div class="panel-head"><div class="panel-title">Q8 &middot; Connection Outcome</div><div class="panel-n num">n=68</div></div><div class="chart-wrap tall"><canvas id="c_q8"></canvas></div><div class="detail-line" id="d_q8"><span class="hint">Click a bar for its exact count</span></div></div>
+        <div class="panel"><div class="panel-head"><div class="panel-title">Q9 &middot; Biggest Impact</div><div class="panel-n num">n=68</div></div><div class="chart-wrap tall"><canvas id="c_q9"></canvas></div><div class="detail-line" id="d_q9"><span class="hint">Click a bar for its exact count</span></div></div>
+      </div>
+
+      <div class="section-label">Cost &amp; awareness &middot; screened n = 68</div>
+      <div class="panel-grid">
+        <div class="panel wide"><div class="panel-head"><div class="panel-title">Q10 &middot; Additional Cost Incurred</div><div class="panel-n num">n=68</div></div><div class="chart-wrap"><canvas id="c_q10"></canvas></div><div class="detail-line" id="d_q10"><span class="hint">Click a bar for its exact count</span></div></div>
+        <div class="panel"><div class="panel-head"><div class="panel-title">Q11 &middot; IRCTC Facility Awareness</div><div class="panel-n num">n=68</div></div><div class="chart-wrap tall"><canvas id="c_q11"></canvas></div><div class="detail-line" id="d_q11"><span class="hint">Click a slice for its exact count</span></div></div>
+      </div>
+
+      <div class="section-label">What they want &middot; screened n = 68</div>
+      <div class="panel-grid">
+        <div class="panel"><div class="panel-head"><div class="panel-title">Q12 &middot; Most Useful Feature</div><div class="panel-n num">n=68</div></div><div class="chart-wrap tall"><canvas id="c_q12"></canvas></div><div class="detail-line" id="d_q12"><span class="hint">Click a bar for its exact count</span></div></div>
+        <div class="panel wide"><div class="panel-head"><div class="panel-title">Q13 &middot; Max Willingness to Pay</div><div class="panel-n num">n=68</div></div><div class="chart-wrap"><canvas id="c_q13"></canvas></div><div class="detail-line" id="d_q13"><span class="hint">Click a bar for its exact count</span></div></div>
+      </div>
+
+      <footer class="page-foot">Figures computed directly from the uploaded survey CSV &middot; 94 responses, 68 screened (Q3 = Yes)</footer>
+    </section>
+
+    <!-- ============ VIEW 2: KPI DASHBOARD ============ -->
+    <section class="view" id="view-kpi">
+      <div class="page-head">
+        <div>
+          <h1>KPI Dashboard</h1>
+          <div class="page-sub">Core behavioural &amp; operational KPIs derived from the screened base, each tied back to a survey question.</div>
+        </div>
+        <div class="page-n num">12 KPIs</div>
+      </div>
+
+      <div class="section-label">Core KPIs</div>
+      <div class="kpi-grid" id="kpiCoreGrid"></div>
+
+      <div class="section-label">Supporting KPIs</div>
+      <div class="kpi-grid" id="kpiExtraGrid"></div>
+
+      <div class="section-label">KPI 6 &middot; Connection Disruption Impact (distribution)</div>
+      <div class="panel-grid">
+        <div class="panel wide">
+          <div class="panel-head"><div class="panel-title">Q9 &middot; What was the biggest impact of the connection problem?</div><div class="panel-n num">n=68</div></div>
+          <div class="chart-wrap tall"><canvas id="c_kpi_impact"></canvas></div>
+          <div class="detail-line" id="d_kpi_impact"><span class="hint">Click a bar for its exact count</span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Connection Outcome Funnel</div><div class="panel-n num">n=68</div></div>
+          <div class="chart-wrap"><canvas id="c_kpi_funnel"></canvas></div>
+          <div class="detail-line" id="d_kpi_funnel"><span class="hint">Click a bar for its exact count</span></div>
+        </div>
+      </div>
+
+      <div class="synth">
+        <span class="synth-tag">Read together</span>
+        <p>The journey is common (<b>72.3%</b>) and booked in pieces (<b>66.2%</b>); planning it is genuinely hard (<b>45.6%</b>); one in three connections carries real risk (<b>36.8%</b> missed or nearly missed) &mdash; yet the IRCTC safety net is almost unknown (<b>45.6%</b> unaware) and <b>63.2%</b> would pay for a real fix.</p>
+      </div>
+
+      <footer class="page-foot">All KPIs computed on the screened base (n=68) unless stated otherwise &middot; source: uploaded survey CSV</footer>
+    </section>
+
+    <!-- ============ VIEW 3: MARKETING METRICS ============ -->
+    <section class="view" id="view-marketing">
+      <div class="page-head">
+        <div>
+          <h1>Marketing Metrics</h1>
+          <div class="page-sub">Demand and monetisation signals for a connecting-journey assistance product, computed against the 2+ train traveller base.</div>
+        </div>
+        <div class="page-n num">n=68 base</div>
+      </div>
+
+      <div class="section-label">Monetisation signals</div>
+      <div class="mm-grid" id="mmMonetize"></div>
+
+      <div class="section-label">Feature-market fit signals</div>
+      <div class="mm-grid" id="mmFeature"></div>
+
+      <div class="section-label">Willingness-to-pay ladder</div>
+      <div class="panel-grid">
+        <div class="panel wide">
+          <div class="panel-head"><div class="panel-title">Q13 &middot; Willingness-to-Pay Tiers</div><div class="panel-n num">n=68</div></div>
+          <div class="chart-wrap"><canvas id="c_mm_wtp"></canvas></div>
+          <div class="detail-line" id="d_mm_wtp"><span class="hint">Click a bar for its exact count</span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Q12 &middot; Feature Demand Ranking</div><div class="panel-n num">n=68</div></div>
+          <div class="chart-wrap tall"><canvas id="c_mm_feature"></canvas></div>
+          <div class="detail-line" id="d_mm_feature"><span class="hint">Click a bar for its exact count</span></div>
+        </div>
+      </div>
+
+      <div class="synth">
+        <span class="synth-tag">Go-to-market read</span>
+        <p>Search &amp; compare is the wedge (<b>42.6%</b> demand) and should be free; onward-travel assistance is the monetisable layer &mdash; <b>63.2%</b> would pay something, and a durable <b>20.6%</b> premium segment would pay more than &#8377;500.</p>
+      </div>
+
+      <footer class="page-foot">Marketing metrics computed on the screened base (n=68) &middot; source: uploaded survey CSV</footer>
+    </section>
+
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   DATA — computed directly from the uploaded survey CSV
+   ============================================================ */
+const SURVEY = {
+ "n_total": 94, "n_screened": 68,
+ "questions": {
+  "q1": {"title":"Age Group","n":94,"data":[["18–24",31],["25–29",16],["30–34",11],["35–39",5],["40–45",8],["46 or above",23]]},
+  "q2": {"title":"Travel Frequency","n":94,"data":[["Less than once a year",16],["1–2 times a year",21],["3–5 times a year",21],["6–10 times a year",19],["More than 10 times a year",17]]},
+  "q3": {"title":"Took a 2+ Train Journey","n":94,"data":[["Yes",68],["No",26]]},
+  "q4": {"title":"Booking Method","n":68,"data":[["Each train leg was booked separately",25],["All train legs were booked together/linked",21],["Some legs were booked together and some separately",20],["I don’t remember",2]]},
+  "q5": {"title":"Planning Method","n":68,"data":[["IRCTC",25],["Train booking app (ixigo, ConfirmTkt, etc.)",14],["Google/Google Maps",13],["I already knew the route",6],["Other",6],["Railway enquiry/staff",2],["Friends/family",1],["Travel agent",1]]},
+  "q6": {"title":"Connection Difficulty","n":68,"data":[["Very easy",7],["Easy",15],["Neither easy nor difficult",15],["Difficult",11],["Very difficult",20]]},
+  "q7": {"title":"Scheduled Buffer Time","n":68,"data":[["Less than 15 minutes",2],["15–30 minutes",6],["31–60 minutes",11],["1–2 hours",21],["2–4 hours",15],["More than 4 hours",5],["Don’t remember",8]]},
+  "q8": {"title":"Connection Outcome","n":68,"data":[["Made the connection comfortably",27],["Made it, but with very little time",16],["Nearly missed the connection",10],["Missed — first train delayed",13],["Missed — other reason",2]]},
+  "q9": {"title":"Biggest Impact","n":68,"data":[["Had to wait for the next train",24],["Not applicable — no problem",14],["Used a bus/cab/other transport",7],["Missed work/class/appointment",7],["No significant impact",7],["Bought another train ticket",5],["Cancelled/changed journey",4]]},
+  "q10": {"title":"Additional Cost","n":68,"data":[["₹0",15],["Less than ₹200",3],["₹200–₹500",8],["₹501–₹1,000",10],["₹1,001–₹2,000",6],["More than ₹2,000",8],["Don’t remember",7],["Not applicable",11]]},
+  "q11": {"title":"IRCTC Facility Awareness","n":68,"data":[["No, not aware",31],["Yes, but never used",15],["Yes, and used it",11],["Heard, not sure",11]]},
+  "q12": {"title":"Most Useful Feature","n":68,"data":[["Compares ALL connecting-train combinations",29],["Automatic backup-train suggestions",15],["Warning when at risk of delay",14],["Help securing next train if missed",6],["Station transfer-time info",4]]},
+  "q13": {"title":"Willingness to Pay","n":68,"data":[["₹0 — refund only",6],["₹1–50",12],["₹51–100",9],["₹101–200",2],["₹201–500",6],["More than ₹500",14],["Depends on journey",14],["Not sure",5]]}
+ }
+};
+
+/* ============================================================
+   THEME / PALETTE
+   ============================================================ */
+const css = getComputedStyle(document.documentElement);
+const tok = name => css.getPropertyValue(name).trim();
+/* Restrained rule: only the single most notable segment gets the accent
+   colour; everything else steps down a neutral slate ramp. This is what
+   keeps a 6-8 category chart from reading as a rainbow. */
+function rankColors(values){
+  const max = Math.max(...values);
+  const ramp = [tok('--slate'), tok('--slate-2'), tok('--slate-3'), tok('--slate-4')];
+  let s = 0, hit = false;
+  return values.map(v => {
+    if(v === max && !hit){ hit = true; return tok('--accent'); }
+    const c = ramp[s % ramp.length]; s++; return c;
+  });
+}
+Chart.defaults.font.family = "Poppins, sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = tok('--ink-soft');
+
+const fmtPct = (v,n) => (100*v/n).toFixed(1) + '%';
+
+/* ============================================================
+   CHART BUILDERS (bar + donut), with click-to-detail wiring
+   ============================================================ */
+function buildBar(canvasId, detailId, qkey, opts={}){
+  const q = SURVEY.questions[qkey];
+  const labels = q.data.map(d=>d[0]);
+  const values = q.data.map(d=>d[1]);
+  const colors = opts.color ? labels.map(()=>opts.color) : rankColors(values);
+  const horizontal = !!opts.horizontal;
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  const chart = new Chart(ctx, {
+    type:'bar',
+    data:{ labels, datasets:[{ data: values, backgroundColor: colors, borderRadius:4, maxBarThickness:38 }]},
+    options:{
+      indexAxis: horizontal ? 'y' : 'x',
+      responsive:true, maintainAspectRatio:false,
+      onClick:(evt, els)=>{
+        if(!els.length) return;
+        const i = els[0].index;
+        showDetail(detailId, labels[i], values[i], q.n);
+      },
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          backgroundColor: tok('--ink'), titleColor: tok('--ground'), bodyColor: tok('--ground'),
+          padding:9, cornerRadius:6, displayColors:false,
+          callbacks:{ label: (c)=> `${c.formattedValue} respondents (${fmtPct(c.raw, q.n)})` }
+        }
+      },
+      scales:{
+        x:{ grid:{ color: tok('--hair') }, ticks:{ color: tok('--muted'), font:{size:10}, autoSkip:false, maxRotation: horizontal?0:40, minRotation: horizontal?0:0 } },
+        y:{ grid:{ color: tok('--hair') }, ticks:{ color: tok('--muted'), font:{size:10} }, beginAtZero:true }
+      }
+    }
+  });
+  return chart;
+}
+
+function buildDonut(canvasId, detailId, qkey){
+  const q = SURVEY.questions[qkey];
+  const labels = q.data.map(d=>d[0]);
+  const values = q.data.map(d=>d[1]);
+  const colors = rankColors(values);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  const chart = new Chart(ctx, {
+    type:'doughnut',
+    data:{ labels, datasets:[{ data: values, backgroundColor: colors, borderColor: tok('--surface'), borderWidth:2 }]},
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'58%',
+      onClick:(evt, els)=>{
+        if(!els.length) return;
+        const i = els[0].index;
+        showDetail(detailId, labels[i], values[i], q.n);
+      },
+      plugins:{
+        legend:{ position:'right', labels:{ color: tok('--ink-soft'), boxWidth:10, font:{size:10.5}, padding:8 } },
+        tooltip:{
+          backgroundColor: tok('--ink'), titleColor: tok('--ground'), bodyColor: tok('--ground'),
+          padding:9, cornerRadius:6, displayColors:false,
+          callbacks:{ label: (c)=> `${c.formattedValue} respondents (${fmtPct(c.raw, q.n)})` }
+        }
+      }
+    }
+  });
+  return chart;
+}
+
+function showDetail(detailId, label, value, base){
+  const el = document.getElementById(detailId);
+  if(!el) return;
+  el.innerHTML = `<b>${label}</b> &mdash; ${value} of ${base} respondents (<b>${fmtPct(value, base)}</b>)`;
+}
+
+/* ============================================================
+   RENDER — Data Explorer
+   ============================================================ */
+buildBar('c_q1','d_q1','q1');
+buildBar('c_q2','d_q2','q2', {horizontal:true});
+buildDonut('c_q3','d_q3','q3');
+buildDonut('c_q4','d_q4','q4');
+buildBar('c_q5','d_q5','q5', {horizontal:true});
+buildBar('c_q6','d_q6','q6');
+buildBar('c_q7','d_q7','q7');
+buildBar('c_q8','d_q8','q8', {horizontal:true});
+buildBar('c_q9','d_q9','q9', {horizontal:true});
+buildBar('c_q10','d_q10','q10');
+buildDonut('c_q11','d_q11','q11');
+buildBar('c_q12','d_q12','q12', {horizontal:true});
+buildBar('c_q13','d_q13','q13');
+
+/* ============================================================
+   RENDER — KPI Dashboard
+   ============================================================ */
+const CORE_KPIS = [
+  { v:"72.3%", l:"Multi-Train Journey Rate", d:"Screened respondents ÷ all respondents. Measures prevalence of the target behaviour.", f:"68 of 94", tone:"base" },
+  { v:"66.2%", l:"Separate Booking Rate", d:"Booked at least one leg apart from the rest. Measures booking fragmentation.", f:"45 of 68", tone:"base" },
+  { v:"45.6%", l:"Connection Planning Difficulty Rate", d:"Rated the comparison process difficult or very difficult. Measures core planning friction.", f:"31 of 68", tone:"risk" },
+  { v:"19.1%", l:"Connection Failure Rate", d:"Missed the connecting train specifically because the first train was delayed.", f:"13 of 68", tone:"risk" },
+  { v:"36.8%", l:"Connection Risk Exposure Rate", d:"Missed (any reason) plus nearly-missed connections. Measures how often risk actually materialises.", f:"25 of 68", tone:"risk" },
+  { v:"Distribution", l:"Connection Disruption Impact", d:"Real-world consequence when a connection goes wrong — see chart below.", f:"see below", tone:"base" },
+];
+const EXTRA_KPIS = [
+  { v:"45.6%", l:"IRCTC Facility Awareness Gap", d:"Did not know IRCTC's delay-refund facility exists before this survey.", f:"31 of 68", tone:"risk" },
+  { v:"16.2%", l:"Facility Utilisation Rate", d:"Have actually used the existing IRCTC refund facility.", f:"11 of 68", tone:"base" },
+  { v:"51.5%", l:"Incurred Additional Cost Rate", d:"Confirmed paying something extra because of the connection problem.", f:"35 of 68", tone:"risk" },
+  { v:"11.8%", l:"High-Cost Incident Rate", d:"Lost more than ₹2,000 on a single broken connection.", f:"8 of 68", tone:"risk" },
+  { v:"27.9%", l:"Short-Buffer Exposure Rate", d:"Scheduled 60 minutes or less between connecting trains.", f:"19 of 68", tone:"risk" },
+  { v:"63.2%", l:"Positive Willingness-to-Pay Rate", d:"Named a definite amount they'd pay for onward-travel help.", f:"43 of 68", tone:"good" },
+];
+function renderKpis(containerId, list){
+  document.getElementById(containerId).innerHTML = list.map(k => `
+    <div class="kpi t-${k.tone}">
+      <div class="kv num">${k.v}</div>
+      <div class="kl">${k.l}</div>
+      <div class="kd">${k.d}</div>
+      <div class="kf num">${k.f}</div>
+    </div>`).join('');
+}
+renderKpis('kpiCoreGrid', CORE_KPIS);
+renderKpis('kpiExtraGrid', EXTRA_KPIS);
+
+buildBar('c_kpi_impact','d_kpi_impact','q9', {horizontal:true});
+
+/* Connection outcome funnel, ordered comfortable -> missed */
+(function(){
+  const q = SURVEY.questions.q8;
+  const order = ["Made the connection comfortably","Made it, but with very little time","Nearly missed the connection","Missed — first train delayed","Missed — other reason"];
+  const map = Object.fromEntries(q.data);
+  const labels = order.map(l => l.replace('Made the connection comfortably','Comfortable').replace('Made it, but with very little time','Very little time').replace('Nearly missed the connection','Nearly missed').replace('Missed — first train delayed','Missed (delay)').replace('Missed — other reason','Missed (other)'));
+  const values = order.map(l => map[l]);
+  const colors = [tok('--slate-3'), tok('--slate-2'), tok('--risk'), tok('--risk'), tok('--risk')];
+  const ctx = document.getElementById('c_kpi_funnel').getContext('2d');
+  new Chart(ctx, {
+    type:'bar',
+    data:{ labels, datasets:[{ data: values, backgroundColor: colors, borderRadius:4, maxBarThickness:30 }]},
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      onClick:(evt, els)=>{ if(!els.length) return; const i=els[0].index; showDetail('d_kpi_funnel', labels[i], values[i], q.n); },
+      plugins:{ legend:{display:false}, tooltip:{ backgroundColor: tok('--ink'), titleColor: tok('--ground'), bodyColor: tok('--ground'), padding:9, cornerRadius:6, displayColors:false, callbacks:{ label:(c)=> `${c.formattedValue} (${fmtPct(c.raw,q.n)})` } } },
+      scales:{ x:{ grid:{color:tok('--hair')}, ticks:{color:tok('--muted'), font:{size:10}}, beginAtZero:true }, y:{ grid:{display:false}, ticks:{color:tok('--muted'), font:{size:10}} } }
+    }
+  });
+})();
+
+/* ============================================================
+   RENDER — Marketing Metrics
+   ============================================================ */
+const MM_MONETIZE = [
+  { v:"63.2%", l:"Potential Paid Customer Rate", formula:"Definite positive WTP ÷ 2+ train travellers × 100", desc:"Indicates potential demand for a paid connecting-journey assistance service.", n:"43 of 68" },
+  { v:"32.4%", l:"₹100+ WTP Rate", formula:"Travellers willing to pay ₹100 or more ÷ 2+ train travellers × 100", desc:"The share of the target segment clearing a ₹100 price floor — useful for initial pricing exploration.", n:"22 of 68" },
+  { v:"20.6%", l:"Premium WTP Rate (>₹500)", formula:"Travellers willing to pay more than ₹500 ÷ 2+ train travellers × 100", desc:"Size of a top-tier / premium-assistance pricing segment.", n:"14 of 68" },
+];
+const MM_FEATURE = [
+  { v:"42.6%", l:"Connection-Comparison Feature Demand", formula:"Selected connection comparison ÷ 2+ train travellers × 100", desc:"Demand for the core proposed value proposition — comparing connecting-train options.", n:"29 of 68" },
+  { v:"22.1%", l:"Backup Train Feature Demand", formula:"Selected backup-train suggestions ÷ 2+ train travellers × 100", desc:"Demand for alternative journey options when the original connection is at risk.", n:"15 of 68" },
+  { v:"20.6%", l:"Risk-Alert Feature Demand", formula:"Selected delay-risk warning ÷ 2+ train travellers × 100", desc:"Demand for proactive alerts before a connection is actually missed.", n:"14 of 68" },
+];
+function renderMM(containerId, list){
+  document.getElementById(containerId).innerHTML = list.map(m => `
+    <div class="mm-card">
+      <div class="mv num">${m.v}</div>
+      <div class="ml">${m.l}</div>
+      <div class="mm-formula">${m.formula}</div>
+      <div class="mm-desc">${m.desc}</div>
+      <div class="mm-desc num" style="color:var(--muted)">${m.n} respondents</div>
+    </div>`).join('');
+}
+renderMM('mmMonetize', MM_MONETIZE);
+renderMM('mmFeature', MM_FEATURE);
+
+buildBar('c_mm_wtp','d_mm_wtp','q13');
+buildBar('c_mm_feature','d_mm_feature','q12', {horizontal:true});
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+document.querySelectorAll('.sb-link').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.sb-link').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-' + btn.dataset.view).classList.add('active');
+    document.getElementById('sbNav').classList.remove('open');
+    window.scrollTo({top:0, behavior:'instant'});
+  });
+});
+document.getElementById('navToggle').addEventListener('click', ()=>{
+  document.getElementById('sbNav').classList.toggle('open');
+});
+</script>
+</body>
+</html>
