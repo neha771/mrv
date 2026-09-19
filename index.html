@@ -124,6 +124,28 @@
   }
   .mm-desc{ font-size:11.5px; color:var(--ink-soft); line-height:1.55; }
 
+  /* ---------------- KPI ring cards ---------------- */
+  .kpi-ring-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .kpi-ring-card{
+    background:var(--surface); border:1px solid var(--hair); border-radius:14px; box-shadow:var(--shadow);
+    padding:18px 18px 16px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:4px;
+  }
+  .kpi-ring-q{
+    align-self:flex-start; font-family:"Poppins",sans-serif; font-size:10px; font-weight:600; color:var(--muted);
+    background:var(--surface-2); border-radius:5px; padding:2px 7px; letter-spacing:.4px;
+  }
+  .kpi-ring-wrap{ position:relative; width:132px; height:132px; margin:2px 0 6px; }
+  .kpi-ring-wrap svg{ width:100%; height:100%; transform:rotate(-90deg); }
+  .kpi-ring-val{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:"Poppins",sans-serif; font-weight:700; font-size:26px;
+  }
+  .kpi-ring-label{ font-weight:700; font-size:14px; color:var(--ink); line-height:1.3; }
+  .kpi-ring-indicates{ font-size:11px; color:var(--ink-soft); line-height:1.5; margin-top:2px; }
+  .kpi-ring-n{ font-size:10px; color:var(--muted); margin-top:6px; }
+  @media (max-width: 900px){ .kpi-ring-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width: 560px){ .kpi-ring-grid{ grid-template-columns:1fr; } }
+
   .synth{
     background:#141C2C; color:#E7E2D4; border-radius:12px; padding:16px 22px;
     display:flex; gap:14px; align-items:center; flex-wrap:wrap; font-size:12.5px; line-height:1.55;
@@ -239,12 +261,12 @@
       <div class="page-head">
         <div>
           <h1>KPI Dashboard</h1>
-          <div class="page-sub">The six headline KPIs — each tied to its survey question and shown with the exact calculation behind it.</div>
+          <div class="page-sub">The six headline KPIs — each tied to its survey question, sized visually, and explained in one line.</div>
         </div>
         <div class="page-n num">6 KPIs</div>
       </div>
 
-      <div class="mm-grid" id="kpiKeyGrid"></div>
+      <div class="kpi-ring-grid" id="kpiKeyGrid"></div>
 
       <div class="synth">
         <span class="synth-tag">Read together</span>
@@ -435,23 +457,35 @@ buildBar('c_q13','d_q13','q13');
    RENDER — KPI Dashboard
    ============================================================ */
 const KEY_KPIS = [
-  { q:"Q3", v:"72.3%", l:"2+ Train Journey Rate", calc:"68 respondents with 2+ train journey ÷ 94 total respondents × 100", n:"68 of 94", tone:"base" },
-  { q:"Q4", v:"66.2%", l:"Separate Ticket Booking Rate", calc:"45 travellers with separately booked legs ÷ 68 multi-train travellers × 100", n:"45 of 68", tone:"base" },
-  { q:"Q6", v:"45.6%", l:"Connection Difficulty Rate", calc:"31 travellers finding connections difficult ÷ 68 multi-train travellers × 100", n:"31 of 68", tone:"risk" },
-  { q:"Q8", v:"19.1%", l:"Missed Connection Rate", calc:"13 travellers missing connection due to delay ÷ 68 multi-train travellers × 100", n:"13 of 68", tone:"risk" },
-  { q:"Q11", v:"45.6%", l:"IRCTC Connecting-Journey Facility Awareness Gap", calc:"31 travellers unaware of facility ÷ 68 multi-train travellers × 100", n:"31 of 68", tone:"risk" },
-  { q:"Q13", v:"63.2%", l:"Positive WTP for Onward Travel Assistance", calc:"43 travellers with positive WTP ÷ 68 multi-train travellers × 100", n:"43 of 68", tone:"good" },
+  { q:"Q3", pct:72.3, l:"2+ Train Journey Rate", indicates:"How common multi-leg train journeys are among all travellers surveyed.", n:"68 of 94", tone:"base" },
+  { q:"Q4", pct:66.2, l:"Separate Ticket Booking Rate", indicates:"How fragmented booking behaviour is — most journeys aren't booked as one product.", n:"45 of 68", tone:"base" },
+  { q:"Q6", pct:45.6, l:"Connection Difficulty Rate", indicates:"The core planning friction travellers face comparing connecting trains.", n:"31 of 68", tone:"risk" },
+  { q:"Q8", pct:19.1, l:"Missed Connection Rate", indicates:"Real journeys broken because the first train ran late.", n:"13 of 68", tone:"risk" },
+  { q:"Q11", pct:45.6, l:"IRCTC Facility Awareness Gap", indicates:"An existing refund safety net most travellers don't know exists.", n:"31 of 68", tone:"risk" },
+  { q:"Q13", pct:63.2, l:"Positive WTP for Onward-Travel Assistance", indicates:"Real demand for a paid rescue service when a connection is missed.", n:"43 of 68", tone:"good" },
 ];
 function renderKeyKpis(containerId, list){
-  const toneColor = t => t === "risk" ? "var(--risk)" : t === "good" ? "var(--accent)" : "var(--ink)";
-  document.getElementById(containerId).innerHTML = list.map(k => `
-    <div class="mm-card">
-      <div class="panel-n num" style="margin-bottom:2px;">${k.q}</div>
-      <div class="mv" style="color:${toneColor(k.tone)}">${k.v}</div>
-      <div class="ml">${k.l}</div>
-      <div class="mm-formula">${k.calc}</div>
-      <div class="mm-desc num" style="color:var(--muted)">${k.n} respondents</div>
-    </div>`).join('');
+  const toneVar = t => t === "risk" ? "var(--risk)" : t === "good" ? "var(--accent)" : "var(--ink)";
+  const r = 54, c = 2 * Math.PI * r;
+  document.getElementById(containerId).innerHTML = list.map(k => {
+    const dash = (k.pct/100) * c;
+    const color = toneVar(k.tone);
+    return `
+    <div class="kpi-ring-card">
+      <div class="kpi-ring-q">${k.q}</div>
+      <div class="kpi-ring-wrap">
+        <svg viewBox="0 0 132 132">
+          <circle cx="66" cy="66" r="${r}" fill="none" stroke="var(--track)" stroke-width="12"/>
+          <circle cx="66" cy="66" r="${r}" fill="none" stroke="${color}" stroke-width="12"
+            stroke-linecap="round" stroke-dasharray="${dash.toFixed(1)} ${c.toFixed(1)}"/>
+        </svg>
+        <div class="kpi-ring-val" style="color:${color}">${k.pct.toFixed(1)}%</div>
+      </div>
+      <div class="kpi-ring-label">${k.l}</div>
+      <div class="kpi-ring-indicates">${k.indicates}</div>
+      <div class="kpi-ring-n num">${k.n} respondents</div>
+    </div>`;
+  }).join('');
 }
 renderKeyKpis('kpiKeyGrid', KEY_KPIS);
 
