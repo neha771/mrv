@@ -239,34 +239,16 @@
       <div class="page-head">
         <div>
           <h1>KPI Dashboard</h1>
-          <div class="page-sub">Core behavioural &amp; operational KPIs derived from the screened base, each tied back to a survey question.</div>
+          <div class="page-sub">The six headline KPIs — each tied to its survey question and shown with the exact calculation behind it.</div>
         </div>
-        <div class="page-n num">12 KPIs</div>
+        <div class="page-n num">6 KPIs</div>
       </div>
 
-      <div class="section-label">Core KPIs</div>
-      <div class="kpi-grid" id="kpiCoreGrid"></div>
-
-      <div class="section-label">Supporting KPIs</div>
-      <div class="kpi-grid" id="kpiExtraGrid"></div>
-
-      <div class="section-label">KPI 6 &middot; Connection Disruption Impact (distribution)</div>
-      <div class="panel-grid">
-        <div class="panel wide">
-          <div class="panel-head"><div class="panel-title">Q9 &middot; What was the biggest impact of the connection problem?</div><div class="panel-n num">n=68</div></div>
-          <div class="chart-wrap tall"><canvas id="c_kpi_impact"></canvas></div>
-          <div class="detail-line" id="d_kpi_impact"><span class="hint">Click a bar for its exact count</span></div>
-        </div>
-        <div class="panel">
-          <div class="panel-head"><div class="panel-title">Connection Outcome Funnel</div><div class="panel-n num">n=68</div></div>
-          <div class="chart-wrap"><canvas id="c_kpi_funnel"></canvas></div>
-          <div class="detail-line" id="d_kpi_funnel"><span class="hint">Click a bar for its exact count</span></div>
-        </div>
-      </div>
+      <div class="mm-grid" id="kpiKeyGrid"></div>
 
       <div class="synth">
         <span class="synth-tag">Read together</span>
-        <p>The journey is common (<b>72.3%</b>) and booked in pieces (<b>66.2%</b>); planning it is genuinely hard (<b>45.6%</b>); one in three connections carries real risk (<b>36.8%</b> missed or nearly missed) &mdash; yet the IRCTC safety net is almost unknown (<b>45.6%</b> unaware) and <b>63.2%</b> would pay for a real fix.</p>
+        <p>The journey is common (<b>72.3%</b>) and booked in pieces (<b>66.2%</b>); planning it is genuinely hard (<b>45.6%</b> found it difficult); <b>19.1%</b> missed a connection to a delay; the IRCTC safety net is almost unknown (<b>45.6%</b> unaware) &mdash; yet <b>63.2%</b> would pay for a real fix.</p>
       </div>
 
       <footer class="page-foot">All KPIs computed on the screened base (n=68) unless stated otherwise &middot; source: uploaded survey CSV</footer>
@@ -452,56 +434,26 @@ buildBar('c_q13','d_q13','q13');
 /* ============================================================
    RENDER — KPI Dashboard
    ============================================================ */
-const CORE_KPIS = [
-  { v:"72.3%", l:"Multi-Train Journey Rate", d:"Screened respondents ÷ all respondents. Measures prevalence of the target behaviour.", f:"68 of 94", tone:"base" },
-  { v:"66.2%", l:"Separate Booking Rate", d:"Booked at least one leg apart from the rest. Measures booking fragmentation.", f:"45 of 68", tone:"base" },
-  { v:"45.6%", l:"Connection Planning Difficulty Rate", d:"Rated the comparison process difficult or very difficult. Measures core planning friction.", f:"31 of 68", tone:"risk" },
-  { v:"19.1%", l:"Connection Failure Rate", d:"Missed the connecting train specifically because the first train was delayed.", f:"13 of 68", tone:"risk" },
-  { v:"36.8%", l:"Connection Risk Exposure Rate", d:"Missed (any reason) plus nearly-missed connections. Measures how often risk actually materialises.", f:"25 of 68", tone:"risk" },
-  { v:"Distribution", l:"Connection Disruption Impact", d:"Real-world consequence when a connection goes wrong — see chart below.", f:"see below", tone:"base" },
+const KEY_KPIS = [
+  { q:"Q3", v:"72.3%", l:"2+ Train Journey Rate", calc:"68 respondents with 2+ train journey ÷ 94 total respondents × 100", n:"68 of 94", tone:"base" },
+  { q:"Q4", v:"66.2%", l:"Separate Ticket Booking Rate", calc:"45 travellers with separately booked legs ÷ 68 multi-train travellers × 100", n:"45 of 68", tone:"base" },
+  { q:"Q6", v:"45.6%", l:"Connection Difficulty Rate", calc:"31 travellers finding connections difficult ÷ 68 multi-train travellers × 100", n:"31 of 68", tone:"risk" },
+  { q:"Q8", v:"19.1%", l:"Missed Connection Rate", calc:"13 travellers missing connection due to delay ÷ 68 multi-train travellers × 100", n:"13 of 68", tone:"risk" },
+  { q:"Q11", v:"45.6%", l:"IRCTC Connecting-Journey Facility Awareness Gap", calc:"31 travellers unaware of facility ÷ 68 multi-train travellers × 100", n:"31 of 68", tone:"risk" },
+  { q:"Q13", v:"63.2%", l:"Positive WTP for Onward Travel Assistance", calc:"43 travellers with positive WTP ÷ 68 multi-train travellers × 100", n:"43 of 68", tone:"good" },
 ];
-const EXTRA_KPIS = [
-  { v:"45.6%", l:"IRCTC Facility Awareness Gap", d:"Did not know IRCTC's delay-refund facility exists before this survey.", f:"31 of 68", tone:"risk" },
-  { v:"16.2%", l:"Facility Utilisation Rate", d:"Have actually used the existing IRCTC refund facility.", f:"11 of 68", tone:"base" },
-  { v:"51.5%", l:"Incurred Additional Cost Rate", d:"Confirmed paying something extra because of the connection problem.", f:"35 of 68", tone:"risk" },
-  { v:"11.8%", l:"High-Cost Incident Rate", d:"Lost more than ₹2,000 on a single broken connection.", f:"8 of 68", tone:"risk" },
-  { v:"27.9%", l:"Short-Buffer Exposure Rate", d:"Scheduled 60 minutes or less between connecting trains.", f:"19 of 68", tone:"risk" },
-  { v:"63.2%", l:"Positive Willingness-to-Pay Rate", d:"Named a definite amount they'd pay for onward-travel help.", f:"43 of 68", tone:"good" },
-];
-function renderKpis(containerId, list){
+function renderKeyKpis(containerId, list){
+  const toneColor = t => t === "risk" ? "var(--risk)" : t === "good" ? "var(--accent)" : "var(--ink)";
   document.getElementById(containerId).innerHTML = list.map(k => `
-    <div class="kpi t-${k.tone}">
-      <div class="kv num">${k.v}</div>
-      <div class="kl">${k.l}</div>
-      <div class="kd">${k.d}</div>
-      <div class="kf num">${k.f}</div>
+    <div class="mm-card">
+      <div class="panel-n num" style="margin-bottom:2px;">${k.q}</div>
+      <div class="mv" style="color:${toneColor(k.tone)}">${k.v}</div>
+      <div class="ml">${k.l}</div>
+      <div class="mm-formula">${k.calc}</div>
+      <div class="mm-desc num" style="color:var(--muted)">${k.n} respondents</div>
     </div>`).join('');
 }
-renderKpis('kpiCoreGrid', CORE_KPIS);
-renderKpis('kpiExtraGrid', EXTRA_KPIS);
-
-buildBar('c_kpi_impact','d_kpi_impact','q9', {horizontal:true});
-
-/* Connection outcome funnel, ordered comfortable -> missed */
-(function(){
-  const q = SURVEY.questions.q8;
-  const order = ["Made the connection comfortably","Made it, but with very little time","Nearly missed the connection","Missed — first train delayed","Missed — other reason"];
-  const map = Object.fromEntries(q.data);
-  const labels = order.map(l => l.replace('Made the connection comfortably','Comfortable').replace('Made it, but with very little time','Very little time').replace('Nearly missed the connection','Nearly missed').replace('Missed — first train delayed','Missed (delay)').replace('Missed — other reason','Missed (other)'));
-  const values = order.map(l => map[l]);
-  const colors = [tok('--slate-3'), tok('--slate-2'), tok('--risk'), tok('--risk'), tok('--risk')];
-  const ctx = document.getElementById('c_kpi_funnel').getContext('2d');
-  new Chart(ctx, {
-    type:'bar',
-    data:{ labels, datasets:[{ data: values, backgroundColor: colors, borderRadius:4, maxBarThickness:30 }]},
-    options:{
-      indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      onClick:(evt, els)=>{ if(!els.length) return; const i=els[0].index; showDetail('d_kpi_funnel', labels[i], values[i], q.n); },
-      plugins:{ legend:{display:false}, tooltip:{ backgroundColor: tok('--ink'), titleColor: tok('--ground'), bodyColor: tok('--ground'), padding:9, cornerRadius:6, displayColors:false, callbacks:{ label:(c)=> `${c.formattedValue} (${fmtPct(c.raw,q.n)})` } } },
-      scales:{ x:{ grid:{color:tok('--hair')}, ticks:{color:tok('--muted'), font:{size:10}}, beginAtZero:true }, y:{ grid:{display:false}, ticks:{color:tok('--muted'), font:{size:10}} } }
-    }
-  });
-})();
+renderKeyKpis('kpiKeyGrid', KEY_KPIS);
 
 /* ============================================================
    RENDER — Marketing Metrics
