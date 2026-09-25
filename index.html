@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Connecting Journeys Dashboard</title>
-<meta name="description" content="Interactive market research dashboard — Connecting Train Journeys in India survey (n=94).">
+<meta name="description" content="Interactive market research dashboard for the Connecting Train Journeys in India survey (n=94).">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
@@ -146,6 +146,85 @@
   @media (max-width: 900px){ .kpi-ring-grid{ grid-template-columns:repeat(2,1fr); } }
   @media (max-width: 560px){ .kpi-ring-grid{ grid-template-columns:1fr; } }
 
+  /* ---------------- numbered page headers ---------------- */
+  .ph-row{ display:flex; align-items:center; gap:14px; }
+  .ph-chip{
+    width:44px; height:44px; border-radius:10px; background:var(--surface-2); border:1px solid var(--hair);
+    display:flex; align-items:center; justify-content:center; flex:none;
+    font-family:"Poppins",sans-serif; font-weight:700; font-size:16px; color:var(--accent);
+  }
+  .ph-eyebrow{ font-family:"Poppins",sans-serif; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-weight:600; }
+  .ph-row h1{ margin-top:2px; }
+
+  /* ---------------- stat chip row ---------------- */
+  .stat-chip-row{ display:flex; gap:12px; flex-wrap:wrap; }
+  .stat-chip-row.center{ justify-content:center; }
+  .stat-chip{
+    background:var(--surface); border:1px solid var(--hair); border-radius:10px; box-shadow:var(--shadow);
+    padding:12px 22px; text-align:center; min-width:110px;
+  }
+  .stat-chip .sv{ font-family:"Poppins",sans-serif; font-weight:700; font-size:21px; color:var(--accent); }
+  .stat-chip .sl{ font-size:10.5px; color:var(--muted); margin-top:2px; }
+
+  /* ---------------- problem statement: hero + supporting row ---------------- */
+  .ps-hero{
+    background:var(--surface); border:1px solid var(--hair); border-radius:14px; box-shadow:var(--shadow);
+    padding:42px 44px; display:flex; flex-direction:column; gap:16px; justify-content:center; min-height:190px;
+  }
+  .ps-hero .pl{ font-family:"Poppins",sans-serif; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); font-weight:700; }
+  .ps-hero p{ margin:0; font-size:24px; font-weight:600; line-height:1.5; color:var(--ink); text-wrap:balance; }
+
+  .ps-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .ps-card{
+    background:var(--surface); border:1px solid var(--hair); border-radius:12px; box-shadow:var(--shadow);
+    padding:16px 18px; display:flex; flex-direction:column; gap:6px;
+  }
+  .ps-num{
+    width:28px; height:28px; border-radius:8px; background:var(--surface-2); border:1px solid var(--hair);
+    display:flex; align-items:center; justify-content:center; margin-bottom:2px;
+    font-family:"Poppins",sans-serif; font-weight:700; font-size:12.5px; color:var(--accent);
+  }
+  .ps-card .pt{ font-weight:700; font-size:14px; }
+  .ps-card p{ margin:0; font-size:12px; color:var(--ink-soft); line-height:1.55; }
+  @media (max-width: 860px){ .ps-row{ grid-template-columns:1fr; } .ps-hero p{ font-size:19px; } }
+
+  /* ---------------- quote card ---------------- */
+  .quote-card{
+    background:#141C2C; border-radius:12px; padding:18px 24px;
+  }
+  .quote-card p{ margin:0; font-style:italic; font-size:13px; line-height:1.65; color:rgba(231,226,212,.92); }
+  .quote-card p b{ font-style:normal; color:#4FE0D3; font-weight:600; }
+
+  /* ---------------- feature cards (recommendation) ---------------- */
+  .feat-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  .feat-card{
+    background:var(--surface); border:1px solid var(--hair); border-radius:12px; box-shadow:var(--shadow);
+    padding:20px 22px; display:flex; flex-direction:column; gap:8px;
+  }
+  .feat-card h3{ margin:0; font-size:15px; font-weight:700; }
+  .feat-card p{ margin:0; font-size:12px; color:var(--ink-soft); line-height:1.6; }
+  .feat-highlight{ font-family:"Poppins",sans-serif; font-size:12px; font-weight:600; color:var(--accent); }
+  .feat-stat{
+    align-self:flex-start; font-family:"Poppins",sans-serif; font-size:10.5px; color:var(--muted);
+    background:var(--surface-2); border:1px solid var(--hair); border-radius:7px; padding:5px 10px; margin-top:2px;
+  }
+  @media (max-width: 700px){ .feat-grid{ grid-template-columns:1fr; } }
+
+  /* ---------------- CTA card (fake-door link) ---------------- */
+  .cta-card{
+    background:var(--surface); border:1px solid var(--hair); border-radius:12px; box-shadow:var(--shadow); padding:18px 22px;
+    display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap;
+  }
+  .cta-copy{ flex:1; min-width:240px; }
+  .cta-eyebrow{ font-family:"Poppins",sans-serif; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+  .cta-card h3{ margin:0 0 4px; font-size:16px; font-weight:700; line-height:1.3; color:var(--ink); text-wrap:balance; }
+  .cta-card p{ margin:0; font-size:11.5px; color:var(--ink-soft); max-width:48ch; line-height:1.55; }
+  .cta-url{
+    font-family:"Poppins",sans-serif; font-weight:600; font-size:13px; color:var(--accent);
+    background:var(--accent-soft); border:1px solid var(--accent); border-radius:8px;
+    padding:11px 20px; text-decoration:none; white-space:nowrap; flex:none;
+  }
+
   .synth{
     background:#141C2C; color:#E7E2D4; border-radius:12px; padding:16px 22px;
     display:flex; gap:14px; align-items:center; flex-wrap:wrap; font-size:12.5px; line-height:1.55;
@@ -196,28 +275,76 @@
       <button class="sb-toggle" id="navToggle">☰ Menu</button>
     </div>
     <nav class="sb-nav" id="sbNav">
-      <button class="sb-link active" data-view="explorer"><span class="ix">01</span> Data Explorer</button>
-      <button class="sb-link" data-view="kpi"><span class="ix">02</span> KPI Dashboard</button>
-      <button class="sb-link" data-view="marketing"><span class="ix">03</span> Marketing Metrics</button>
+      <button class="sb-link active" data-view="problem"><span class="ix">01</span> Business Problem</button>
+      <button class="sb-link" data-view="explorer"><span class="ix">02</span> Data Explorer</button>
+      <button class="sb-link" data-view="kpi"><span class="ix">03</span> KPI Dashboard</button>
+      <button class="sb-link" data-view="marketing"><span class="ix">04</span> Marketing Metrics</button>
+      <button class="sb-link" data-view="solution"><span class="ix">05</span> Solution &amp; Proposition</button>
     </nav>
     <div class="sb-meta">
       <div>SAMPLE <b class="num">n = 94</b></div>
       <div>SCREENED BASE <b class="num">n = 68</b></div>
       <div>INSTRUMENT <b>13-Q survey</b></div>
       <div>SOURCE <b>Uploaded CSV</b></div>
+      <div>TEAM <b>Neha Susan Manoj, Snigdha Pani, Nagam Chandrakanth Reddy</b></div>
     </div>
   </aside>
 
   <main>
 
+    <!-- ============ VIEW 0: PROBLEM STATEMENT ============ -->
+    <section class="view active" id="view-problem">
+      <div class="page-head">
+        <div class="ph-row">
+          <div class="ph-chip">01</div>
+          <div>
+            <div class="ph-eyebrow">Business Problem</div>
+            <h1>Why This Study Exists</h1>
+          </div>
+        </div>
+        <div class="page-n num">Team 5 · IRCTC</div>
+      </div>
+
+      <div class="ps-hero">
+        <div class="pl">Problem Statement</div>
+        <p>Frequent, long-distance Indian train travellers who need two or more trains to reach their destination struggle to find and compare reliable connecting-train options, and a delay on the first leg puts the entire journey at risk.</p>
+      </div>
+
+      <div class="ps-row">
+        <div class="ps-card">
+          <div class="ps-num">1</div>
+          <div class="pt">Who</div>
+          <p>Frequent, long-distance travellers who take 2+ train journeys, mostly aged 18 to 50, screened for this exact behaviour rather than by age alone.</p>
+        </div>
+        <div class="ps-card">
+          <div class="ps-num">2</div>
+          <div class="pt">Pain</div>
+          <p>Manual route-finding, uncertain connection buffers, and a forfeited leg when the first train runs late.</p>
+        </div>
+        <div class="ps-card">
+          <div class="ps-num">3</div>
+          <div class="pt">Research Question</div>
+          <p>How big is this problem, how do travellers cope today, and what would a real solution be worth to them?</p>
+        </div>
+      </div>
+
+      <footer class="page-foot">Team 5 · Connecting Train Journeys Survey (n = 94)</footer>
+    </section>
+
     <!-- ============ VIEW 1: DATA EXPLORER ============ -->
-    <section class="view active" id="view-explorer">
+    <section class="view" id="view-explorer">
       <div class="page-head">
         <div>
           <h1>Data Explorer</h1>
           <div class="page-sub">Every question from the survey, charted from the raw response file. Click any bar or slice for its exact count.</div>
         </div>
         <div class="page-n num">All charts live · click to inspect</div>
+      </div>
+
+      <div class="stat-chip-row center">
+        <div class="stat-chip"><div class="sv num">n = 94</div><div class="sl">Total responses</div></div>
+        <div class="stat-chip"><div class="sv num">n = 68</div><div class="sl">Screened base</div></div>
+        <div class="stat-chip"><div class="sv num">13</div><div class="sl">Survey questions</div></div>
       </div>
 
       <div class="section-label">Who we surveyed &middot; n = 94</div>
@@ -261,7 +388,7 @@
       <div class="page-head">
         <div>
           <h1>KPI Dashboard</h1>
-          <div class="page-sub">The six headline KPIs — each tied to its survey question, sized visually, and explained in one line.</div>
+          <div class="page-sub">The six headline KPIs, each tied to its survey question, sized visually and explained in one line.</div>
         </div>
         <div class="page-n num">6 KPIs</div>
       </div>
@@ -270,7 +397,7 @@
 
       <div class="synth">
         <span class="synth-tag">Read together</span>
-        <p>The journey is common (<b>72.3%</b>) and booked in pieces (<b>66.2%</b>); planning it is genuinely hard (<b>45.6%</b> found it difficult); <b>19.1%</b> missed a connection to a delay; the IRCTC safety net is almost unknown (<b>45.6%</b> unaware) &mdash; yet <b>63.2%</b> would pay for a real fix.</p>
+        <p>The journey is common (<b>72.3%</b>) and booked in pieces (<b>66.2%</b>); planning it is genuinely hard (<b>45.6%</b> found it difficult); <b>19.1%</b> missed a connection to a delay; the IRCTC safety net is almost unknown (<b>45.6%</b> unaware); yet <b>63.2%</b> would pay for a real fix.</p>
       </div>
 
       <footer class="page-foot">All KPIs computed on the screened base (n=68) unless stated otherwise &middot; source: uploaded survey CSV</footer>
@@ -308,10 +435,56 @@
 
       <div class="synth">
         <span class="synth-tag">Go-to-market read</span>
-        <p>Search &amp; compare is the wedge (<b>42.6%</b> demand) and should be free; onward-travel assistance is the monetisable layer &mdash; <b>63.2%</b> would pay something, and a durable <b>20.6%</b> premium segment would pay more than &#8377;500.</p>
+        <p>Search &amp; compare is the wedge (<b>42.6%</b> demand) and should be free; onward-travel assistance is the monetisable layer: <b>63.2%</b> would pay something, and a durable <b>20.6%</b> premium segment would pay more than &#8377;500.</p>
       </div>
 
       <footer class="page-foot">Marketing metrics computed on the screened base (n=68) &middot; source: uploaded survey CSV</footer>
+    </section>
+
+    <!-- ============ VIEW 4: RECOMMENDATION ============ -->
+    <section class="view" id="view-solution">
+      <div class="page-head">
+        <div class="ph-row">
+          <div class="ph-chip">05</div>
+          <div>
+            <div class="ph-eyebrow">Solution &amp; Proposition</div>
+            <h1>A Data-Backed Two-Part Solution</h1>
+          </div>
+        </div>
+        <div class="page-n num">Proposed &amp; validated live</div>
+      </div>
+
+      <div class="quote-card">
+        <p>The KPIs describe one connected failure: the problem is common (<b>72.3%</b>), planning it is genuinely hard (<b>45.6%</b>), it fails often enough to matter (<b>19.1%</b> missed), and the safety net is almost unknown (<b>45.6%</b> unaware); yet demand for a real fix is strong (<b>63.2%</b> would pay).</p>
+      </div>
+
+      <div class="feat-grid">
+        <div class="feat-card">
+          <div class="ps-num">1</div>
+          <h3>Connection Search &amp; Compare</h3>
+          <p>Surface every viable two-train combination for a route, not just the nearest direct train, with connection-gap and delay-risk shown before booking.</p>
+          <div class="feat-highlight">Priced free: the acquisition surface.</div>
+          <div class="feat-stat num">Q12 &middot; 42.6% demand</div>
+        </div>
+        <div class="feat-card">
+          <div class="ps-num">2</div>
+          <h3>Onward-Travel Guarantee</h3>
+          <p>Convert IRCTC's existing refund-only protection into an assistance service: rebooking or onward-travel help the moment a connection is missed.</p>
+          <div class="feat-highlight">Priced on the 63.2% positive WTP signal.</div>
+          <div class="feat-stat num">Q13 &middot; 63.2% would pay</div>
+        </div>
+      </div>
+
+      <div class="cta-card">
+        <div class="cta-copy">
+          <div class="cta-eyebrow">Fake-door test &middot; live</div>
+          <h3>RailConnext: the sign-up page we put in front of real travellers</h3>
+          <p>Shared on LinkedIn and travel community groups to see who actually signs up, before a line of the real product gets built.</p>
+        </div>
+        <a class="cta-url" href="https://railconnext.vercel.app/" target="_blank" rel="noopener">railconnext.vercel.app ↗</a>
+      </div>
+
+      <footer class="page-foot">Next: validate signups from the live fake-door test, then expand the sample beyond n = 94.</footer>
     </section>
 
   </main>
@@ -319,7 +492,7 @@
 
 <script>
 /* ============================================================
-   DATA — computed directly from the uploaded survey CSV
+   DATA: computed directly from the uploaded survey CSV
    ============================================================ */
 const SURVEY = {
  "n_total": 94, "n_screened": 68,
@@ -331,12 +504,12 @@ const SURVEY = {
   "q5": {"title":"Planning Method","n":68,"data":[["IRCTC",25],["Train booking app (ixigo, ConfirmTkt, etc.)",14],["Google/Google Maps",13],["I already knew the route",6],["Other",6],["Railway enquiry/staff",2],["Friends/family",1],["Travel agent",1]]},
   "q6": {"title":"Connection Difficulty","n":68,"data":[["Very easy",7],["Easy",15],["Neither easy nor difficult",15],["Difficult",11],["Very difficult",20]]},
   "q7": {"title":"Scheduled Buffer Time","n":68,"data":[["Less than 15 minutes",2],["15–30 minutes",6],["31–60 minutes",11],["1–2 hours",21],["2–4 hours",15],["More than 4 hours",5],["Don’t remember",8]]},
-  "q8": {"title":"Connection Outcome","n":68,"data":[["Made the connection comfortably",27],["Made it, but with very little time",16],["Nearly missed the connection",10],["Missed — first train delayed",13],["Missed — other reason",2]]},
-  "q9": {"title":"Biggest Impact","n":68,"data":[["Had to wait for the next train",24],["Not applicable — no problem",14],["Used a bus/cab/other transport",7],["Missed work/class/appointment",7],["No significant impact",7],["Bought another train ticket",5],["Cancelled/changed journey",4]]},
+  "q8": {"title":"Connection Outcome","n":68,"data":[["Made the connection comfortably",27],["Made it, but with very little time",16],["Nearly missed the connection",10],["Missed (first train delayed)",13],["Missed (other reason)",2]]},
+  "q9": {"title":"Biggest Impact","n":68,"data":[["Had to wait for the next train",24],["Not applicable, no problem",14],["Used a bus/cab/other transport",7],["Missed work/class/appointment",7],["No significant impact",7],["Bought another train ticket",5],["Cancelled/changed journey",4]]},
   "q10": {"title":"Additional Cost","n":68,"data":[["₹0",15],["Less than ₹200",3],["₹200–₹500",8],["₹501–₹1,000",10],["₹1,001–₹2,000",6],["More than ₹2,000",8],["Don’t remember",7],["Not applicable",11]]},
   "q11": {"title":"IRCTC Facility Awareness","n":68,"data":[["No, not aware",31],["Yes, but never used",15],["Yes, and used it",11],["Heard, not sure",11]]},
   "q12": {"title":"Most Useful Feature","n":68,"data":[["Compares ALL connecting-train combinations",29],["Automatic backup-train suggestions",15],["Warning when at risk of delay",14],["Help securing next train if missed",6],["Station transfer-time info",4]]},
-  "q13": {"title":"Willingness to Pay","n":68,"data":[["₹0 — refund only",6],["₹1–50",12],["₹51–100",9],["₹101–200",2],["₹201–500",6],["More than ₹500",14],["Depends on journey",14],["Not sure",5]]}
+  "q13": {"title":"Willingness to Pay","n":68,"data":[["₹0 (refund only)",6],["₹1–50",12],["₹51–100",9],["₹101–200",2],["₹201–500",6],["More than ₹500",14],["Depends on journey",14],["Not sure",5]]}
  }
 };
 
@@ -433,11 +606,11 @@ function buildDonut(canvasId, detailId, qkey){
 function showDetail(detailId, label, value, base){
   const el = document.getElementById(detailId);
   if(!el) return;
-  el.innerHTML = `<b>${label}</b> &mdash; ${value} of ${base} respondents (<b>${fmtPct(value, base)}</b>)`;
+  el.innerHTML = `<b>${label}</b>: ${value} of ${base} respondents (<b>${fmtPct(value, base)}</b>)`;
 }
 
 /* ============================================================
-   RENDER — Data Explorer
+   RENDER: Data Explorer
    ============================================================ */
 buildBar('c_q1','d_q1','q1');
 buildBar('c_q2','d_q2','q2', {horizontal:true});
@@ -454,11 +627,11 @@ buildBar('c_q12','d_q12','q12', {horizontal:true});
 buildBar('c_q13','d_q13','q13');
 
 /* ============================================================
-   RENDER — KPI Dashboard
+   RENDER: KPI Dashboard
    ============================================================ */
 const KEY_KPIS = [
   { q:"Q3", pct:72.3, l:"2+ Train Journey Rate", indicates:"How common multi-leg train journeys are among all travellers surveyed.", n:"68 of 94", tone:"base" },
-  { q:"Q4", pct:66.2, l:"Separate Ticket Booking Rate", indicates:"How fragmented booking behaviour is — most journeys aren't booked as one product.", n:"45 of 68", tone:"base" },
+  { q:"Q4", pct:66.2, l:"Separate Ticket Booking Rate", indicates:"How fragmented booking behaviour is: most journeys aren't booked as one product.", n:"45 of 68", tone:"base" },
   { q:"Q6", pct:45.6, l:"Connection Difficulty Rate", indicates:"The core planning friction travellers face comparing connecting trains.", n:"31 of 68", tone:"risk" },
   { q:"Q8", pct:19.1, l:"Missed Connection Rate", indicates:"Real journeys broken because the first train ran late.", n:"13 of 68", tone:"risk" },
   { q:"Q11", pct:45.6, l:"IRCTC Facility Awareness Gap", indicates:"An existing refund safety net most travellers don't know exists.", n:"31 of 68", tone:"risk" },
@@ -490,15 +663,15 @@ function renderKeyKpis(containerId, list){
 renderKeyKpis('kpiKeyGrid', KEY_KPIS);
 
 /* ============================================================
-   RENDER — Marketing Metrics
+   RENDER: Marketing Metrics
    ============================================================ */
 const MM_MONETIZE = [
   { v:"63.2%", l:"Potential Paid Customer Rate", formula:"Definite positive WTP ÷ 2+ train travellers × 100", desc:"Indicates potential demand for a paid connecting-journey assistance service.", n:"43 of 68" },
-  { v:"32.4%", l:"₹100+ WTP Rate", formula:"Travellers willing to pay ₹100 or more ÷ 2+ train travellers × 100", desc:"The share of the target segment clearing a ₹100 price floor — useful for initial pricing exploration.", n:"22 of 68" },
+  { v:"32.4%", l:"₹100+ WTP Rate", formula:"Travellers willing to pay ₹100 or more ÷ 2+ train travellers × 100", desc:"The share of the target segment clearing a ₹100 price floor, useful for initial pricing exploration.", n:"22 of 68" },
   { v:"20.6%", l:"Premium WTP Rate (>₹500)", formula:"Travellers willing to pay more than ₹500 ÷ 2+ train travellers × 100", desc:"Size of a top-tier / premium-assistance pricing segment.", n:"14 of 68" },
 ];
 const MM_FEATURE = [
-  { v:"42.6%", l:"Connection-Comparison Feature Demand", formula:"Selected connection comparison ÷ 2+ train travellers × 100", desc:"Demand for the core proposed value proposition — comparing connecting-train options.", n:"29 of 68" },
+  { v:"42.6%", l:"Connection-Comparison Feature Demand", formula:"Selected connection comparison ÷ 2+ train travellers × 100", desc:"Demand for the core proposed value proposition: comparing connecting-train options.", n:"29 of 68" },
   { v:"22.1%", l:"Backup Train Feature Demand", formula:"Selected backup-train suggestions ÷ 2+ train travellers × 100", desc:"Demand for alternative journey options when the original connection is at risk.", n:"15 of 68" },
   { v:"20.6%", l:"Risk-Alert Feature Demand", formula:"Selected delay-risk warning ÷ 2+ train travellers × 100", desc:"Demand for proactive alerts before a connection is actually missed.", n:"14 of 68" },
 ];
